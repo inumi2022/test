@@ -2,10 +2,85 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>はじめてのWebページ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nintendo Switch 2 パッケージソフト一覧</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>こんにちは！私のWebページへようこそ</h1>
-    <p>ここから少しずつカスタマイズしていきます。</p>
+<body class="bg-slate-50 text-slate-800 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    
+    <div class="max-w-5xl mx-auto">
+        <!-- ヘッダー -->
+        <header class="mb-8 text-center">
+            <div class="inline-block mb-3 px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-xs font-semibold tracking-wide uppercase">
+                自動更新システム稼働中
+            </div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+                Nintendo Switch 2 
+            </h1>
+            <p class="mt-2 text-sm text-slate-500">パッケージソフト発売スケジュール＆価格一覧</p>
+        </header>
+
+        <!-- メインカード -->
+        <div class="bg-white shadow-xl shadow-slate-200/50 rounded-2xl border border-slate-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-900 text-white text-xs uppercase tracking-wider">
+                            <th class="py-4 px-6 font-semibold">ステータス</th>
+                            <th class="py-4 px-6 font-semibold">タイトル</th>
+                            <th class="py-4 px-6 font-semibold">発売日 ↕</th>
+                            <th class="py-4 px-6 font-semibold">メーカー</th>
+                            <th class="py-4 px-6 font-semibold">価格 ↕</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-sm">
+                        <!-- サンプルデータ1 -->
+                        <tr class="hover:bg-slate-50/80 transition duration-150">
+                            <td class="py-4 px-6 whitespace-nowrap">
+                                <span class="px-2.5 py-1 bg-emerald-50 text-emerald-600 rounded-full text-xs font-medium">予約受付中</span>
+                            </td>
+                            <td class="py-4 px-6 font-semibold text-slate-900">
+                                <a href="#" class="hover:text-indigo-600 transition">サンプルゲームタイトル A</a>
+                            </td>
+                            <td class="py-4 px-6 text-slate-600 whitespace-nowrap">2026/10/15</td>
+                            <td class="py-4 px-6 text-slate-600">任天堂</td>
+                            <td class="py-4 px-6 text-slate-900 font-bold whitespace-nowrap">¥7,980</td>
+                        </tr>
+                        <!-- サンプルデータ2 -->
+                        <tr class="hover:bg-slate-50/80 transition duration-150">
+                            <td class="py-4 px-6 whitespace-nowrap">
+                                <span class="px-2.5 py-1 bg-amber-50 text-amber-600 rounded-full text-xs font-medium">発売間近</span>
+                            </td>
+                            <td class="py-4 px-6 font-semibold text-slate-900">
+                                <a href="#" class="hover:text-indigo-600 transition">サンプルタイトル B (デラックス版)</a>
+                            </td>
+                            <td class="py-4 px-6 text-slate-600 whitespace-nowrap">2026/09/28</td>
+                            <td class="py-4 px-6 text-slate-600">スクウェア・エニックス</td>
+                            <td class="py-4 px-6 text-slate-900 font-bold whitespace-nowrap">¥9,900</td>
+                        </tr>
+                        <!-- サンプルデータ3 -->
+                        <tr class="hover:bg-slate-50/80 transition duration-150">
+                            <td class="py-4 px-6 whitespace-nowrap">
+                                <span class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-medium">発表</span>
+                            </td>
+                            <td class="py-4 px-6 font-semibold text-slate-900">
+                                <a href="#" class="hover:text-indigo-600 transition">サンプルソフト C</a>
+                            </td>
+                            <td class="py-4 px-6 text-slate-600 whitespace-nowrap">2026/12/20</td>
+                            <td class="py-4 px-6 text-slate-600">カプコン</td>
+                            <td class="py-4 px-6 text-slate-900 font-bold whitespace-nowrap">¥8,800</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- フッター -->
+        <footer class="mt-8 text-center text-xs text-slate-400">
+            <p>※ このデータはGitHub Actionsにより自動同期されています。</p>
+        </footer>
+    </div>
+
 </body>
 </html>
