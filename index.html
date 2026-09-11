@@ -5,7 +5,10 @@
     <title>ゲームソフト一覧</title>
     <style>
         body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; color: #333; }
-        .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #f4f4f4; padding: 10px; border-radius: 6px; }
+        .controls { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 20px; background: #f4f4f4; padding: 15px; border-radius: 6px; }
+        .control-group { display: flex; align-items: center; gap: 8px; }
+        input[type="text"] { padding: 6px 10px; border-radius: 4px; border: 1px solid #ccc; width: 200px; }
+        select { padding: 6px; border-radius: 4px; border: 1px solid #ccc; }
         ul { list-style: none; padding: 0; }
         li { background: #fff; border: 1px solid #ddd; margin-bottom: 8px; padding: 12px; border-radius: 4px; display: flex; justify-content: space-between; }
         .date { color: #666; font-size: 0.9em; }
@@ -13,27 +16,34 @@
         button { padding: 8px 16px; cursor: pointer; border: 1px solid #ccc; background: #fff; border-radius: 4px; }
         button:disabled { opacity: 0.5; cursor: not-allowed; }
         button.active { background: #007bff; color: #fff; border-color: #007bff; }
-    -   select { padding: 6px; border-radius: 4px; border: 1px solid #ccc; }
     </style>
 </head>
 <body>
 
     <h1>ゲームソフト一覧</h1>
 
-    <!-- ソート機能エリア -->
+    <!-- 検索とソートのコントロールエリア -->
     <div class="controls">
-        <label>
-            並び替え: 
-            <select id="sortSelect" onchange="changeSort()">
-                <option value="id-asc">登録順（古い順）</option>
-                <option value="id-desc">登録順（新しい順）</option>
-                <option value="name-asc">タイトル名（昇順 あ〜わ）</option>
-                <option value="name-desc">タイトル名（降順 わ〜あ）</option>
-                <option value="date-desc">発売日（新しい順）</option>
-                <option value="date-asc">発売日（古い順）</option>
-            </select>
-        </label>
-        <span id="itemCount">読み込み中...</span>
+        <div class="control-group">
+            <label>
+                キーワード: 
+                <input type="text" id="searchInput" placeholder="ゲーム名で検索..." oninput="handleSearchInput()">
+            </label>
+        </div>
+        <div class="control-group">
+            <label>
+                並び替え: 
+                <select id="sortSelect" onchange="updateDisplay()">
+                    <option value="id-asc">登録順（古い順）</option>
+                    <option value="id-desc">登録順（新しい順）</option>
+                    <option value="name-asc">タイトル名（昇順 あ〜わ）</option>
+                    <option value="name-desc">タイトル名（降順 わ〜あ）</option>
+                    <option value="date-desc">発売日（新しい順）</option>
+                    <option value="date-asc">発売日（古い順）</option>
+                </select>
+            </label>
+            <span id="itemCount">読み込み中...</span>
+        </div>
     </div>
 
     <!-- リスト表示エリア -->
@@ -46,7 +56,6 @@
         let allData = [];
         let currentPage = 1;
         const itemsPerPage = 20; // 1ページあたりの表示件数
-        let currentSort = "id-asc";
 
         // 1. ページ読み込み時にJSONを取得する
         window.addEventListener('DOMContentLoaded', async () => {
@@ -59,49 +68,61 @@
             }
         });
 
-        // 2. ソート変更時の処理
-        function changeSort() {
-            currentSort = document.getElementById('sortSelect').value;
-            currentPage = 1; // ソートしたら1ページ目に戻す
+        // 2. 検索窓に入力があった時の処理
+        function handleSearchInput() {
+            currentPage = 1; // 検索ワードが変わったら1ページ目に戻す
             updateDisplay();
         }
 
-        // 3. データの並び替えとページ分割を実行して画面を更新
+        // 3. データの絞り込み、並び替え、ページ分割を実行して画面を更新
         function updateDisplay() {
-            // データのコピーを作ってソート
-            let sortedData = [...allData];
-            
-            sortedData.sort((a, b) => {
+            const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
+            const currentSort = document.getElementById('sortSelect').value;
+
+            // ① キーワードで絞り込み（フィルター）
+            let filteredData = allData.filter(item => {
+                return item.name.toLowerCase().includes(keyword);
+            });
+
+            // ② ソート（並び替え）
+            filteredData.sort((a, b) => {
                 if (currentSort === 'id-asc') return a.id - b.id;
                 if (currentSort === 'id-desc') return b.id - a.id;
                 if (currentSort === 'name-asc') return a.name.localeCompare(b.name, 'ja');
-                if (currentSort === 'name-desc') return b.name.localeCompare(a.name, 'ja') * -1;
+                if (currentSort === 'name-desc') return a.name.localeCompare(b.name, 'ja') * -1;
                 if (currentSort === 'date-asc') return new Date(a.date) - new Date(b.date);
                 if (currentSort === 'date-desc') return new Date(b.date) - new Date(a.date);
             });
 
-            // 件数表示の更新
-            document.getElementById('itemCount').innerText = `全 ${sortedData.length} 件中`;
+            // 件数表示の更新（全件数に対するヒット件数を表示）
+            document.getElementById('itemCount').innerText = `全 ${allData.length} 件中 ${filteredData.length} 件`;
 
-            // ページ送りの計算
+            // ③ ページ送りの計算
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage) || 1;
+            if (currentPage > totalPages) currentPage = totalPages; // ページ数超過防止
+
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
-            const currentItems = sortedData.slice(startIndex, endIndex);
+            const currentItems = filteredData.slice(startIndex, endIndex);
 
-            // リストのHTML生成
+            // ④ リストのHTML生成
             const listEl = document.getElementById('itemList');
             listEl.innerHTML = '';
-            currentItems.forEach(item => {
-                listEl.innerHTML += `<li><span>${item.name}</span> <span class="date">発売日: ${item.date}</span></li>`;
-            });
+            
+            if (currentItems.length === 0) {
+                listEl.innerHTML = '<li>一致するゲームが見つかりませんでした。</li>';
+            } else {
+                currentItems.forEach(item => {
+                    listEl.innerHTML += `<li><span>${item.name}</span> <span class="date">発売日: ${item.date}</span></li>`;
+                });
+            }
 
-            // ページネーションボタンの生成
-            renderPagination(sortedData.length);
+            // ⑤ ページネーションボタンの描画
+            renderPagination(totalPages);
         }
 
-        // 4. ページネーションの描画
-        function renderPagination(totalItems) {
-            const totalPages = Math.ceil(totalItems / itemsPerPage);
+        // 6. ページネーションの描画
+        function renderPagination(totalPages) {
             const paginationEl = document.getElementById('pagination');
             paginationEl.innerHTML = '';
 
