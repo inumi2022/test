@@ -89,7 +89,10 @@
             padding: 0;
         }
 
+        /* カード本体の相対位置設定（バッジを重ねるため） */
         .card {
+            position: relative; /* ←ここが重要 */
+            overflow: hidden;   /* 角丸からはみ出さないようにする */
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 12px;
@@ -101,6 +104,33 @@
             justify-content: space-between;
         }
 
+        /* メルカリ風 左上バッジのデザイン */
+        .type-badge {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #fff;
+            border-bottom-right-radius: 12px; /* 左上を起点に右下だけ角丸にするとかわいい */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* 種類ごとの色分け */
+        .type-badge.game { background-color: #10b981; } /* 緑 (〇) */
+        .type-badge.key  { background-color: #ef4444; } /* 赤 (×) */
+        .type-badge.tbd  { background-color: #94a3b8; } /* グレー (?) */
+
+        /* バッジがある分、カードタイトルの左側に少し余白をあける */
+        .card-content {
+            padding-left: 12px;
+        }
+        
         .card:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
@@ -184,11 +214,6 @@
             border-color: var(--primary);
         }
 
-        .card {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
         .card-bottom {
             display: flex;
             justify-content: space-between;
@@ -303,23 +328,33 @@
                 listEl.innerHTML = '<li class="no-result">一致するゲームが見つかりませんでした。</li>';
             } else {
                 currentItems.forEach(item => {
-                    // タイトル名をURL用にエンコード
                     const encodedName = encodeURIComponent(item.name);
-
-                    // 【自動生成】Amazonと楽天のアフィリエイト/検索リンクを作成
-                    // ※ 実際のID（example-22 や rakuten_id）をご自身のものに書き換えてください
                     const amazonUrl = `https://www.amazon.co.jp/s?k=${encodedName}&tag=YOUR_AMAZON_TAG-22`;
                     const rakutenUrl = `https://search.rakuten.co.jp/search/mall/${encodedName}/?scid=af_ich_link_dtc`;
 
+                    // typeの値に応じて、記号(symbol)とクラス名(className)を自動変換
+                    let typeSymbol = "？";
+                    let typeClass = "tbd";
+                    if (item.type === "game") {
+                        typeSymbol = "〇";
+                        typeClass = "game";
+                    } else if (item.type === "key") {
+                        typeSymbol = "×";
+                        typeClass = "key";
+                    }
+
                     listEl.innerHTML += `
                         <li class="card">
-                            <div>
+                            <!-- 左上のメルカリ風バッジ -->
+                            <div class="type-badge ${typeClass}">${typeSymbol}</div>
+            
+                            <div class="card-content">
                                 <div class="card-title">${item.name}</div>
                                 <div class="date">📅 発売日: ${item.date}</div>
                             </div>
                             <div class="card-bottom">
                                 <span class="card-id">ID: ${item.id}</span>
-                                <div class="affiliate-links">
+                            <div class="affiliate-links">
                                     <a href="${amazonUrl}" target="_blank" rel="noopener noreferrer" class="aff-btn amazon">Amazon</a>
                                     <a href="${rakutenUrl}" target="_blank" rel="noopener noreferrer" class="aff-btn rakuten">楽天</a>
                                 </div>
