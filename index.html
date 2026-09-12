@@ -2,20 +2,187 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ゲームソフト一覧</title>
     <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; color: #333; }
-        .controls { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 20px; background: #f4f4f4; padding: 15px; border-radius: 6px; }
-        .control-group { display: flex; align-items: center; gap: 8px; }
-        input[type="text"] { padding: 6px 10px; border-radius: 4px; border: 1px solid #ccc; width: 200px; }
-        select { padding: 6px; border-radius: 4px; border: 1px solid #ccc; }
-        ul { list-style: none; padding: 0; }
-        li { background: #fff; border: 1px solid #ddd; margin-bottom: 8px; padding: 12px; border-radius: 4px; display: flex; justify-content: space-between; }
-        .date { color: #666; font-size: 0.9em; }
-        .pagination { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
-        button { padding: 8px 16px; cursor: pointer; border: 1px solid #ccc; background: #fff; border-radius: 4px; }
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
-        button.active { background: #007bff; color: #fff; border-color: #007bff; }
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            line-height: 1.5;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 24px;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        /* コントロールエリア（検索＆ソート） */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"], select {
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            background-color: #fff;
+            color: var(--text-main);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        input[type="text"] {
+            width: 220px;
+        }
+
+        #itemCount {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            font-weight: 500;
+        }
+
+        /* カードグリッドレイアウト（レスポンシブ対応） */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+            list-style: none;
+            padding: 0;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 1.05rem;
+            margin-bottom: 12px;
+            color: var(--text-main);
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+            padding-top: 12px;
+            margin-top: auto;
+        }
+
+        .card-id {
+            font-size: 0.75rem;
+            background: #f1f5f9;
+            color: var(--text-sub);
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-weight: 500;
+        }
+
+        .date {
+            color: var(--text-sub);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .no-result {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            color: var(--text-sub);
+            border: 1px solid var(--border-color);
+        }
+
+        /* ページネーション */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            margin-top: 40px;
+        }
+
+        button.page-btn {
+            padding: 8px 14px;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-main);
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        button.page-btn:hover:not(:disabled) {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        button.page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        button.page-btn.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
     </style>
 </head>
 <body>
@@ -25,130 +192,121 @@
     <!-- 検索とソートのコントロールエリア -->
     <div class="controls">
         <div class="control-group">
-            <label>
-                キーワード: 
-                <input type="text" id="searchInput" placeholder="ゲーム名で検索..." oninput="handleSearchInput()">
-            </label>
+            <input type="text" id="searchInput" placeholder="🔍 ゲーム名で検索..." oninput="handleSearchInput()">
         </div>
         <div class="control-group">
-            <label>
-                並び替え: 
-                <select id="sortSelect" onchange="updateDisplay()">
-                    <option value="id-asc">登録順（古い順）</option>
-                    <option value="id-desc">登録順（新しい順）</option>
-                    <option value="name-asc">タイトル名（昇順 あ〜わ）</option>
-                    <option value="name-desc">タイトル名（降順 わ〜あ）</option>
-                    <option value="date-desc">発売日（新しい順）</option>
-                    <option value="date-asc">発売日（古い順）</option>
-                </select>
-            </label>
+            <select id="sortSelect" onchange="updateDisplay()">
+                <option value="id-asc">登録順（古い順）</option>
+                <option value="id-desc">登録順（新しい順）</option>
+                <option value="name-asc">タイトル名（昇順 あ〜わ）</option>
+                <option value="name-desc">タイトル名（降順 わ〜あ）</option>
+                <option value="date-desc">発売日（新しい順）</option>
+                <option value="date-asc">発売日（古い順）</option>
+            </select>
             <span id="itemCount">読み込み中...</span>
         </div>
     </div>
 
-    <!-- リスト表示エリア -->
-    <ul id="itemList"></ul>
+    <!-- リスト表示エリア（グリッド） -->
+    <ul id="itemList" class="grid-container"></ul>
 
-    <!-- ページ送り（ページネーション）エリア -->
+    <!-- ページ送りエリア -->
     <div class="pagination" id="pagination"></div>
 
     <script>
         let allData = [];
         let currentPage = 1;
-        const itemsPerPage = 20; // 1ページあたりの表示件数
+        const itemsPerPage = 20;
 
-        // 1. ページ読み込み時にJSONを取得する
         window.addEventListener('DOMContentLoaded', async () => {
             try {
                 const response = await fetch('data.json');
                 allData = await response.json();
                 updateDisplay();
             } catch (error) {
-                document.getElementById('itemList').innerHTML = '<li>データの読み込みに失敗しました。</li>';
+                document.getElementById('itemList').innerHTML = '<li class="no-result">データの読み込みに失敗しました。</li>';
             }
         });
 
-        // 2. 検索窓に入力があった時の処理
         function handleSearchInput() {
-            currentPage = 1; // 検索ワードが変わったら1ページ目に戻す
+            currentPage = 1;
             updateDisplay();
         }
 
-        // 3. データの絞り込み、並び替え、ページ分割を実行して画面を更新
         function updateDisplay() {
             const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
             const currentSort = document.getElementById('sortSelect').value;
 
-            // ① キーワードで絞り込み（フィルター）
             let filteredData = allData.filter(item => {
                 return item.name.toLowerCase().includes(keyword);
             });
 
-            // ② ソート（並び替え）
             filteredData.sort((a, b) => {
                 if (currentSort === 'id-asc') return a.id - b.id;
                 if (currentSort === 'id-desc') return b.id - a.id;
                 if (currentSort === 'name-asc') return a.name.localeCompare(b.name, 'ja');
-                if (currentSort === 'name-desc') return a.name.localeCompare(b.name, 'ja') * -1;
+                if (currentSort === 'name-desc') return b.name.localeCompare(a.name, 'ja') * -1;
                 if (currentSort === 'date-asc') return new Date(a.date) - new Date(b.date);
                 if (currentSort === 'date-desc') return new Date(b.date) - new Date(a.date);
             });
 
-            // 件数表示の更新（全件数に対するヒット件数を表示）
             document.getElementById('itemCount').innerText = `全 ${allData.length} 件中 ${filteredData.length} 件`;
 
-            // ③ ページ送りの計算
             const totalPages = Math.ceil(filteredData.length / itemsPerPage) || 1;
-            if (currentPage > totalPages) currentPage = totalPages; // ページ数超過防止
+            if (currentPage > totalPages) currentPage = totalPages;
 
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
             const currentItems = filteredData.slice(startIndex, endIndex);
 
-            // ④ リストのHTML生成
             const listEl = document.getElementById('itemList');
             listEl.innerHTML = '';
             
             if (currentItems.length === 0) {
-                listEl.innerHTML = '<li>一致するゲームが見つかりませんでした。</li>';
+                listEl.innerHTML = '<li class="no-result">一致するゲームが見つかりませんでした。</li>';
             } else {
                 currentItems.forEach(item => {
-                    listEl.innerHTML += `<li><span>${item.name}</span> <span class="date">発売日: ${item.date}</span></li>`;
+                    listEl.innerHTML = listEl.innerHTML + `
+                        <li class="card">
+                            <div class="card-title">${item.name}</div>
+                            <div class="card-footer">
+                                <span class="card-id">ID: ${item.id}</span>
+                                <span class="date">📅 ${item.date}</span>
+                            </div>
+                        </li>
+                    `;
                 });
             }
 
-            // ⑤ ページネーションボタンの描画
             renderPagination(totalPages);
         }
 
-        // 6. ページネーションの描画
         function renderPagination(totalPages) {
             const paginationEl = document.getElementById('pagination');
             paginationEl.innerHTML = '';
 
             if (totalPages <= 1) return;
 
-            // 前へボタン
             const prevBtn = document.createElement('button');
+            prevBtn.className = 'page-btn';
             prevBtn.innerText = '前へ';
             prevBtn.disabled = currentPage === 1;
-            prevBtn.onclick = () => { currentPage--; updateDisplay(); };
+            prevBtn.onclick = () => { currentPage--; updateDisplay(); window.scrollTo({top: 0, behavior: 'smooth'}); };
             paginationEl.appendChild(prevBtn);
 
-            // ページ番号ボタン
             for (let i = 1; i <= totalPages; i++) {
                 const pageBtn = document.createElement('button');
+                pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
                 pageBtn.innerText = i;
-                if (i === currentPage) pageBtn.classList.add('active');
-                pageBtn.onclick = () => { currentPage = i; updateDisplay(); };
+                pageBtn.onclick = () => { currentPage = i; updateDisplay(); window.scrollTo({top: 0, behavior: 'smooth'}); };
                 paginationEl.appendChild(pageBtn);
             }
 
-            // 次へボタン
             const nextBtn = document.createElement('button');
+            nextBtn.className = 'page-btn';
             nextBtn.innerText = '次へ';
             nextBtn.disabled = currentPage === totalPages;
-            nextBtn.onclick = () => { currentPage++; updateDisplay(); };
+            nextBtn.onclick = () => { currentPage++; updateDisplay(); window.scrollTo({top: 0, behavior: 'smooth'}); };
             paginationEl.appendChild(nextBtn);
         }
     </script>
