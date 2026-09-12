@@ -183,6 +183,43 @@
             color: #fff;
             border-color: var(--primary);
         }
+
+        .card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .card-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+            padding-top: 12px;
+            margin-top: 16px;
+        }
+        .affiliate-links {
+            display: flex;
+            gap: 6px;
+        }
+        .aff-btn {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            color: #fff;
+        }
+        .aff-btn.amazon {
+            background-color: #ff9900;
+            color: #111;
+        }
+        .aff-btn.rakuten {
+            background-color: #bf0000;
+        }
+        .aff-btn:hover {
+            opacity: 0.85;
+        }
+        
     </style>
 </head>
 <body>
@@ -266,12 +303,26 @@
                 listEl.innerHTML = '<li class="no-result">一致するゲームが見つかりませんでした。</li>';
             } else {
                 currentItems.forEach(item => {
-                    listEl.innerHTML = listEl.innerHTML + `
+                    // タイトル名をURL用にエンコード
+                    const encodedName = encodeURIComponent(item.name);
+
+                    // 【自動生成】Amazonと楽天のアフィリエイト/検索リンクを作成
+                    // ※ 実際のID（example-22 や rakuten_id）をご自身のものに書き換えてください
+                    const amazonUrl = `https://www.amazon.co.jp/s?k=${encodedName}&tag=YOUR_AMAZON_TAG-22`;
+                    const rakutenUrl = `https://search.rakuten.co.jp/search/mall/${encodedName}/?scid=af_ich_link_dtc`;
+
+                    listEl.innerHTML += `
                         <li class="card">
-                            <div class="card-title">${item.name}</div>
-                            <div class="card-footer">
+                            <div>
+                                <div class="card-title">${item.name}</div>
+                                <div class="date">📅 発売日: ${item.date}</div>
+                            </div>
+                            <div class="card-bottom">
                                 <span class="card-id">ID: ${item.id}</span>
-                                <span class="date">📅 ${item.date}</span>
+                                <div class="affiliate-links">
+                                    <a href="${amazonUrl}" target="_blank" rel="noopener noreferrer" class="aff-btn amazon">Amazon</a>
+                                    <a href="${rakutenUrl}" target="_blank" rel="noopener noreferrer" class="aff-btn rakuten">楽天</a>
+                                </div>
                             </div>
                         </li>
                     `;
